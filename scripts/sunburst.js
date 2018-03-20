@@ -1,5 +1,5 @@
 var rawSunData, sunTable = new Array, sunQuery = "table";  //default has all available countries, all available songs
-drawRawSunData();
+//drawRawSunData();
 
 function drawRawSunData(){
     rawSunData = new Array;
@@ -76,7 +76,7 @@ function drawRawSunData(){
 function updateChart(table){
     showLoading();
     //remove any existing charts
-    clearChildren(document.getElementById("v1"));
+    clearChildren(document.getElementById("sunburst"));
 
     var width = 600, height = 600,
         radius = (Math.min(width, height)/2 ) - 10;
@@ -85,7 +85,7 @@ function updateChart(table){
         y = d3.scaleSqrt().range([0, radius]),
         formatNumber = d3.format(",d");
 
-    var svg = d3.select("#v1").append("svg").attr("width", width).attr("height", height)
+    var svg = d3.select("#sunburst").append("svg").attr("width", width).attr("height", height)
         .append("g")
         .attr("transform", "translate(" + (width/2) + "," + (height/2) + ")");
 
@@ -196,13 +196,13 @@ function updateChart(table){
 }
 
 function showSunBurst(){
-    document.getElementById("loader").style.display = "none";
-    document.getElementById("v1").style.display = "block";
+    //document.getElementById("loader").style.display = "none";
+    document.getElementById("sunburst").style.display = "block";
 }
 
 function showLoading(){
-    document.getElementById("v1").style.display = "none";
-    document.getElementById("loader").style.display = "block";
+    document.getElementById("sunburst").style.display = "none";
+    //document.getElementById("loader").style.display = "block";
 }
 function deleteLater(){
     drawRawSunData();

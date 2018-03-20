@@ -20,8 +20,9 @@ d3.csv('dataWithGenres.csv',
 
         var newdata = data.filter(val => {return val.Region == "global"; });
 
-        var treemap = new Treemap(d3.select(".vis2"), newdata, 
-            function() {});
+        var treemap = new Treemap(d3.select("#treemap"), newdata, function() {});
+        var sunburst = new drawRawSunData();
+        StreamGraph.draw(data, 'orange');
 
         // var sunburstChart = new SunburstChart(d3.select(".vis1"), data, function() {});
         // var parallelChart = new ParallelChart(d3.select(".vis3"), data, function() {
