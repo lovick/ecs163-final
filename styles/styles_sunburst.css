@@ -1,7 +1,7 @@
 #v1_sunburst{
     text-align: center;
-    width: 500px;
-    height: 500px;
+    width: 600px;
+    height: 650px;
 }
 
 #loader {
@@ -32,6 +32,10 @@
 #v1 {
     font-family: Calibri, Arial, "sans-serif";
 }
+#v1_query {
+     font-family: Calibri, Arial, "sans-serif";
+     text-align: center;
+ }
 .animate-bottom {
     position: relative;
     -webkit-animation-name: animatebottom;

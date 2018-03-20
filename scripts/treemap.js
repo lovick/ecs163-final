@@ -86,8 +86,8 @@ function Treemap(container, data, initialDepartment) {
     console.log(result);
 
     var margin = {top: 40, right: 10, bottom: 10, left: 10},
-      width = 960 - margin.left - margin.right,
-      height = 500 - margin.top - margin.bottom,
+      width = (innerWidth - margin.left - margin.right) * 0.45,
+      height = (innerHeight - margin.top - margin.bottom) * 0.5,
       color = d3.scaleOrdinal().range(d3.schemeCategory20c);
 
     var div = container.append("div")
@@ -101,7 +101,7 @@ function Treemap(container, data, initialDepartment) {
         .size([width, height]);
 
     var root = d3.hierarchy(result, (d) => d.children)
-        .sum((d) => d.value)
+        .sum((d) => d.value);
 
 
     var treemap = treemap(root);
