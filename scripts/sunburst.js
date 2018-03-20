@@ -1,5 +1,21 @@
 var rawSunData, sunTable = new Array, sunQuery = "table";  //default has all available countries, all available songs
+var mapSVG, artistQuery = "";
 drawRawSunData();
+var keys =  ["PHL", "USA", "DEU", "BRA", "SWE", "MEX", "ESP", "NLD", "GBR", "AUS"];
+var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global"];
+
+var mapdata = {
+    PHL: { fillKey: 'Overdue' },
+    USA: { fillKey: 'Overdue' },
+    DEU: { fillKey: 'Overdue' },
+    BRA: { fillKey: 'Overdue' },
+    SWE: { fillKey: 'Overdue' },
+    MEX: { fillKey: 'Overdue' },
+    ESP: { fillKey: 'Overdue' },
+    NLD: { fillKey: 'Overdue' },
+    GBR: { fillKey: 'Overdue' },
+    AUS: { fillKey: 'Overdue' }
+};
 
 function drawRawSunData(){
     rawSunData = new Array;
@@ -17,18 +33,36 @@ function drawRawSunData(){
 
                 var exists = doesRegionAlreadyExist(region);
                 //console.log(exists);
+                //check if region exists in region
                 if (exists < 0){
-                    var newSongList = new Array;
+                    var newArtistList = new Array;
                     var newRegion = {
                         name: region,
-                        children: newSongList
+                        children: newArtistList
                     };
                     rawSunData.push(newRegion);
                     exists = rawSunData.length - 1;
                 }
+                var artist = d["Artist"];
+
+                //check if region exists in region
+                var exists2 = doesArtistAlreadyExist(artist,rawSunData[exists].children);
+                if (exists2 < 0){
+                    var newSongList = new Array;
+                    var newRegion = {
+                        name: artist,
+                        children: newSongList,
+                        streams: parseInt(d["Streams"])
+                    };
+                    rawSunData[exists].children.push(newRegion);
+                    //exists2 = rawSunData[exists].children.length - 1;
+                } else {
+                    rawSunData[exists].children[exists2].streams += parseInt(d["Streams"]);
+                }
 
                 //check if song exists in region's songlist and add to streamcount else new song
-                var gotSong = doesSongAlreadyExist(d["Track Name"], rawSunData[exists].children);
+                /*
+                var gotSong = doesSongAlreadyExist(d["Track Name"], rawSunData[exists].children[exists2].children);
                 if (gotSong < 0){
                     var song = {
                         name: d["Track Name"],
@@ -36,21 +70,30 @@ function drawRawSunData(){
                         streams: parseInt(d["Streams"]),
                         region: d["Region"]
                     };
-                    rawSunData[exists].children.push(song);
+                    rawSunData[exists].children[exists2].children.push(song);
                 } else {
-                    rawSunData[exists].children[gotSong].streams += parseInt(d["Streams"]);
-                }
+                    rawSunData[exists].children[exists2].children[gotSong].streams += parseInt(d["Streams"]);
+                }*/
             }
         });
 
         //initialize chart
         sunTable = {"name": "table", "children": rawSunData};
+        changeSunQueryLabel();
         updateChart(sunTable);
     });
 
     function doesRegionAlreadyExist(regionName){
         for (var i = 0; i < rawSunData.length; i++){
             if (rawSunData[i].name == regionName){
+                return i;
+            }
+        }
+        return -1;
+    }
+    function doesArtistAlreadyExist(artistName, artistList){
+        for (var i = 0; i < artistList.length; i++){
+            if (artistList[i].name == artistName){
                 return i;
             }
         }
@@ -78,7 +121,7 @@ function updateChart(table){
     //remove any existing charts
     clearChildren(document.getElementById("v1"));
 
-    var width = 600, height = 600,
+    var width = 500, height = 500,
         radius = (Math.min(width, height)/2 ) - 10;
     var color = d3.scaleOrdinal(d3.schemeCategory20),
         x = d3.scaleLinear().range([0, 2 * Math.PI]),
@@ -119,8 +162,15 @@ function updateChart(table){
         .append("svg:title")
         .text(function(d){
             var s;
-            if (d.depth <= 1){
-                s = d.data.name.toUpperCase();
+            if (d.depth <= 2){
+                if (d.depth == 1){
+                    var keys =  ["Philippines", "USA", "Germany", "Brazil", "Sweden", "Mexico",
+                        "Spain", "Netherlands", "Great Britain", "Australia", "Global", "Unselected"];
+                    var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
+                    s = keys[skeys.indexOf(d.data.name)];
+                } else {
+                    s = d.data.name;
+                }
             } else {
                 s = d.data.name
                     + "\nby " + d.data.artist
@@ -163,18 +213,30 @@ function updateChart(table){
     //console.log(table);
 
     function clickSun(d){
-        if (d.depth > 1){
+        if (d.depth > 2){
             return;
         } else if (d.depth < 1){
             sunQuery = "table";
-        } else {
+            artistQuery = "";
+        } else if (d.depth == 1) {
             if (d.data.name != sunQuery){
                 sunQuery = d.data.name;
+                artistQuery = "";
+            } else if (artistQuery.length > 0){
+                sunQuery = d.data.name;
+                artistQuery = "";
             } else {
                 sunQuery = "table";
+                artistQuery = "";
+            }
+        } else if (d.depth == 2){
+            if (d.data.name != artistQuery){
+                sunQuery = d.parent.data.name;
+                artistQuery = d.data.name;
+            } else {
             }
         }
-        console.log(sunQuery);
+        changeSunQueryLabel();
         transitionSun(d);
         //TODO: signal change to other viz here
     }
@@ -198,17 +260,34 @@ function updateChart(table){
 function showSunBurst(){
     document.getElementById("loader").style.display = "none";
     document.getElementById("v1").style.display = "block";
+    document.getElementById("v1_query").style.display = "block";
 }
 
 function showLoading(){
     document.getElementById("v1").style.display = "none";
+    document.getElementById("v1_query").style.display = "none";
     document.getElementById("loader").style.display = "block";
 }
-function deleteLater(){
-    drawRawSunData();
-}
+
 function clearChildren(element){
     while (element.firstChild){
         element.removeChild(element.firstChild);
     }
+}
+
+function changeSunQueryLabel(){
+    var p = document.getElementById("v1_query");
+    clearChildren(p);
+    var keys =  ["Philippines", "USA", "Germany", "Brazil", "Sweden", "Mexico",
+                "Spain", "Netherlands", "Great Britain", "Australia", "Global", "Unselected"];
+    var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
+    var string = keys[skeys.indexOf(sunQuery)];
+    if (artistQuery.length > 0){
+        string += " > " + artistQuery;
+    }
+
+    var text = document.createElement("p");
+    var text2 = document.createTextNode(string);
+    text.appendChild(text2);
+    p.appendChild(text);
 }

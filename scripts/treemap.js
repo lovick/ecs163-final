@@ -101,7 +101,7 @@ function Treemap(container, data, initialDepartment) {
         .size([width, height]);
 
     var root = d3.hierarchy(result, (d) => d.children)
-        .sum((d) => d.value)
+        .sum((d) => d.value);
 
 
     var treemap = treemap(root);
