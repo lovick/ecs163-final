@@ -142,6 +142,7 @@ function updateSunburstChart(table){
         .append("g")
         .attr("transform", "translate(" + (width/2) + "," + (height/2) + ")");
 
+    //reference : https://bl.ocks.org/mbostock/4348373
     var partition = d3.partition(); //.size([2 * Math.PI, radius]);
     var root = d3.hierarchy(table);
     root.sum(function(d){ return d.streams; });
