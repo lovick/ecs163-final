@@ -3,17 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="text/javascript" src="scripts/d3.v4.min.js"></script>
-    <script src="scripts/sunburst.js"></script>
     <!-- I recommend you host this file on your own, since this will change without warning -->
    <link rel="stylesheet" type="text/css" href="styles/styles_sunburst.css">
+    <script src="scripts/d3.v4.min.js"></script>
+    <script src="scripts/queue.v1.min.js"></script>
+    <script src="scripts/topojson.v2.min.js"></script>
+    <script src="scripts/d3-geo-projection.v1.min.js"></script>
 </head>
 <body>
+    <div id="sun"></div>
     <div id="v1_sunburst">
         <div id="loader"></div>
         <div id="v1_query"></div>
         <div id="v1" class="animate-bottom">
         </div>
     </div>
+    <script src="scripts/sunburst.js"></script> <!--DO NOT MOVE-->
+
 </body>
 </html>

@@ -94,3 +94,31 @@ form {
   grid-row: 2;
   grid-column: 1;
 }
+
+#sunmap{
+  grid-row: 1;
+  grid-column: 2;
+}
+/*Map*/
+.stroke {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+.fill {
+  fill: #fff;
+}
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+.land {
+  fill: #CCCCCC;
+}
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
