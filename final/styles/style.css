@@ -148,7 +148,19 @@ form {
   stroke-width: .5px;
 }
 
-#tooltip { 
+#tooltip{ 
+  position: absolute;
+  grid-row: 1;
+  grid-column: 1;
+  z-index: 10;
+  opacity: 0;
+  background-color: white;
+  padding: 3px 5px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+#tree-tooltip{ 
   position: absolute;
   grid-row: 1;
   grid-column: 1;

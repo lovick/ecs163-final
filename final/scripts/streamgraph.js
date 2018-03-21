@@ -192,6 +192,9 @@ function Streamgraph(container, data) {
     
                 function mouseOutArc(){
                     d3.select(this).attr("stroke","")
+                    svg.selectAll("path").transition()
+                        .duration(250)
+                        .attr("opacity", 1)
                     return tooltip.style("visibility", "hidden");
                 }
     

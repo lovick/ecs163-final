@@ -91,6 +91,13 @@ function Treemap(container, data, updateFunc) {
       color = d3.scaleOrdinal().range(d3.schemeCategory20);
 
     container.selectAll("*").remove();
+
+    // container.append("p")
+    //         .style("margin-top", '0px')
+    //         .style("margin-bottom", '0px')
+    //         .style("top", margin.top + "px")
+    //         .text("Distribution of Popular Genres and Top Artists");
+
     var div = container.append("div")
             .style("position", "relative")
             .style("width", (width + margin.left + margin.right) + "px")
@@ -120,12 +127,34 @@ function Treemap(container, data, updateFunc) {
           .text((d) => d.data.key)
           .on("click", function(d) {
             updateFunc(d.parent.data.name);
-          });
-          // .append('div')
-          // .style("font-size", function(d) {
-          //     // compute font size based on sqrt(area)
-          //     return Math.max(20, 0.18*Math.sqrt(d.area))+'px'; })
-          // .text(function(d) { return d.children ? null : d.name; });
+          })
+          .on("mouseover", mouseOverArc)
+          .on("mousemove", mouseMoveArc)
+          .on("mouseout", mouseOutArc);
+
+          var tooltip = d3.select("#tree-tooltip");
+
+          function mouseOverArc(d, i) {
+                  tooltip.style("visibility", "visible");
+                  tooltip.html(d.data.key);
+                  // tooltip.html(d.key + "<br>" + invertedx);
+                  return tooltip.transition()
+                    .duration(50)
+                    .style("opacity", 0.9);
+          }
+
+          function mouseOutArc(){
+                  return tooltip.style("visibility", "hidden");
+          }
+    
+          function mouseMoveArc (d) {
+                tooltip.style("visibility", "visible");
+                tooltip.html(d.data.key);
+    
+                return tooltip
+                  .style("top", (d3.event.pageY-10)+"px")
+                  .style("left", (d3.event.pageX+10)+"px");
+          }
      
     var svg = div.append('svg')
     .attr('width', width + 200)
