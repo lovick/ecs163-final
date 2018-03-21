@@ -39,6 +39,13 @@ d3.csv('dataWithGenres.csv',
         //     sunburstChart.update(parallelChart.newData,[]);
         // });
         dat = data;
+        d3.select("#v1_sunburst").append("p")
+            .attr("id", "v1_label")
+            .style("position", "relative")
+            .style("margin-top", '0px')
+            .style("left", '160px')
+            .attr("text-anchor", "middle")
+            .text("Regional Distribution of Artists and Songs");
 });
 
 var parseDate = d3.timeParse("%m/%d/%y");

@@ -262,12 +262,6 @@ function updateSunburstChart(table){
     }
 
     //showSunBurst();
-    d3.select("#v1_sunburst").append("p")
-            .style("position", "relative")
-            .style("margin-top", '0px')
-            .style("left", '160px')
-            .attr("text-anchor", "middle")
-            .text("Regional Distribution of Artists and Songs");
     setTimeout(showSunBurst, 1000);
 }
 
@@ -275,12 +269,16 @@ function updateSunburstChart(table){
 function showSunBurst(){
     document.getElementById("loader").style.display = "none";
     document.getElementById("v1").style.display = "block";
+    document.getElementById("v1_label").style.display = "block";
     document.getElementById("v1_query").style.display = "block";
 }
 
 //take out previous vis and display loading
 function showLoading(){
     document.getElementById("v1").style.display = "none";
+    if (document.getElementById("v1_label") != null){
+        document.getElementById("v1_label").style.display = "none";
+    }
     document.getElementById("v1_query").style.display = "none";
     document.getElementById("loader").style.display = "block";
 }
