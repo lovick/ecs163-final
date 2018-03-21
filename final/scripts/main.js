@@ -54,9 +54,6 @@ function sunburstUpdate(query) {
     changeNation(query);
 
     var sunFormat = getSunFormat(dat.filter(d => { return d.Region == curRegion; }));
-
-    console.log("Sunburst Update for Sunburst");
-    updateSunburstChart(sunFormat);
     console.log("Sunburst Update for Treemap");
     treemap = new Treemap(d3.select("#treemap"), dat.filter(d => { return d.Region == curRegion; }), treemapUpdate);
 }
@@ -72,6 +69,7 @@ function treemapUpdate(genre) {
 
 function timeUpdate(start, end) {
     // update streamgraph, treemap, and sunburst to show only data from that timerange
+    artistQuery = ""
     console.log(start + "; " + end);
     var newDat = dat.filter(d => { return new Date(d.Date) > start && new Date(d.Date) < end; });
     var sunFormat = getSunFormat(newDat);
@@ -79,7 +77,7 @@ function timeUpdate(start, end) {
     console.log("Time Update for Sunburst");
     updateSunburstChart(sunFormat);
     console.log("Time Update for Treemap");
-    treemap = new Treemap(d3.select("#treemap"), newDat.filter(d => { return d.Region == curRegion; }), treemapUpdate);
+    treemap = new Treemap(d3.select("#treemap"), newDat, treemapUpdate);
     // some streamgraph shit
 
 }

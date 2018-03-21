@@ -35,6 +35,7 @@
 #v1_query {
      font-family: Calibri, Arial, "sans-serif";
      text-align: center;
+        width: 600px;
  }
 .animate-bottom {
     position: relative;
