@@ -4,6 +4,11 @@ d3.selectAll("text").attr("fill", "white");
 
 var curRegion = "global";
 
+var treemap;
+var sunburst;
+var time;
+var dat;
+
 d3.csv('dataWithGenres.csv',
     function(datum){ 
         // get all of our data into the requisite format first
@@ -22,17 +27,20 @@ d3.csv('dataWithGenres.csv',
 
         var newdata = data.filter(val => {return val.Region == "global"; });
 
-        var treemap = new Treemap(d3.select("#treemap"), newdata, function() {});
-        var sunburst = new drawRawSunData(alert);
+        treemap = new Treemap(d3.select("#treemap"), newdata, treemapUpdate);
+        sunburst = new drawRawSunData(data, sunburstUpdate);
         //StreamGraph.draw(data, 'orange');
-        var time = new timeBrush(data, curRegion, console.log("updatefunc"));
+        time = new timeBrush(data, curRegion, timeUpdate);
 
         // var sunburstChart = new SunburstChart(d3.select(".vis1"), data, function() {});
         // var parallelChart = new ParallelChart(d3.select(".vis3"), data, function() {
         //     barChart.update(parallelChart.newData);
         //     sunburstChart.update(parallelChart.newData,[]);
         // });
+        dat = data;
 });
+
+var parseDate = d3.timeParse("%m/%d/%y");
 
 function sunburstUpdate(query) {
     // update just like map
@@ -41,10 +49,15 @@ function sunburstUpdate(query) {
 
 function treemapUpdate(genre) {
     // update streamgraph
+    console.log(genre);
 }
 
 function timeUpdate(start, end) {
     // update streamgraph, treemap, and sunburst to show only data from that timerange
+    console.log(start + "; " + end);
+    var newDat = dat.filter(d => {return new Date(d.Date) > start && new Date(d.Date) < end});
+    var sunFormat = {"name": "table", "children": transformToSunburst(newDat)};
+    updateSunburstChart(sunFormat);
 }
 
 function streamgraphUpdate(value) {

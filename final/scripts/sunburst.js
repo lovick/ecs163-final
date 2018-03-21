@@ -1,6 +1,5 @@
-var rawSunData, sunTable = new Array, sunQuery = "table";  //default has all available countries, all available songs
+var sunTable = new Array, sunQuery = "table";  //default has all available countries, all available songs
 var mapSVG, artistQuery = "";
-drawRawSunData();
 var keys =  ["PHL", "USA", "DEU", "BRA", "SWE", "MEX", "ESP", "NLD", "GBR", "AUS"];
 var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global"];
 
@@ -19,77 +18,80 @@ var mapdata = {
 
 var sunburstUpdate;
 
-function drawRawSunData(func){
+function drawRawSunData(datIn, func){
     //console.log(func);
     sunburstUpdate = func;
-    rawSunData = new Array;
-    d3.csv("./filteredData.csv", function(data){
-        //load compiled data and save as a bunch of json objects to be used for later
-        //TODO: change to include main.js data
-        data.forEach(function (d){
-            var date = d["Date"];
+    var rawSunData = transformToSunburst(datIn);
 
-            //check if region already exists in rawData else make a new one
-            var region = d["Region"];
+    //initialize chart
+    sunTable = {"name": "table", "children": rawSunData};
+    changeSunQueryLabel();
+    updateSunburstChart(sunTable);
 
-            if (region.length <= 2 || region == "global"){
-                //console.log(region);
+}
 
-                var exists = doesRegionAlreadyExist(region);
-                //console.log(exists);
-                //check if region exists in region
-                if (exists < 0){
-                    var newArtistList = new Array;
-                    var newRegion = {
-                        name: region,
-                        children: newArtistList
-                    };
-                    rawSunData.push(newRegion);
-                    exists = rawSunData.length - 1;
-                }
-                var artist = d["Artist"];
 
-                //check if region exists in region
-                var exists2 = doesArtistAlreadyExist(artist,rawSunData[exists].children);
-                if (exists2 < 0){
-                    var newSongList = new Array;
-                    var newRegion = {
-                        name: artist,
-                        children: newSongList,
-                        streams: parseInt(d["Streams"])
-                    };
-                    rawSunData[exists].children.push(newRegion);
-                    //exists2 = rawSunData[exists].children.length - 1;
-                } else {
-                    rawSunData[exists].children[exists2].streams += parseInt(d["Streams"]);
-                }
+function transformToSunburst(data) {
+    var rawDat = new Array;
+    console.log(data);
+    data.forEach(function (d){
+        var date = d["Date"];
 
-                //check if song exists in region's songlist and add to streamcount else new song
-                /*
-                var gotSong = doesSongAlreadyExist(d["Track Name"], rawSunData[exists].children[exists2].children);
-                if (gotSong < 0){
-                    var song = {
-                        name: d["Track Name"],
-                        artist: d["Artist"],
-                        streams: parseInt(d["Streams"]),
-                        region: d["Region"]
-                    };
-                    rawSunData[exists].children[exists2].children.push(song);
-                } else {
-                    rawSunData[exists].children[exists2].children[gotSong].streams += parseInt(d["Streams"]);
-                }*/
+        //check if region already exists in rawData else make a new one
+        var region = d["Region"];
+
+        if (region.length <= 2 || region == "global"){
+            //console.log(region);
+
+            var exists = doesRegionAlreadyExist(region);
+            //console.log(exists);
+            //check if region exists in region
+            if (exists < 0){
+                var newArtistList = new Array;
+                var newRegion = {
+                    name: region,
+                    children: newArtistList
+                };
+                rawDat.push(newRegion);
+                exists = rawDat.length - 1;
             }
-        });
+            var artist = d["Artist"];
 
-        //initialize chart
-        sunTable = {"name": "table", "children": rawSunData};
-        changeSunQueryLabel();
-        updateChart(sunTable);
+            //check if region exists in region
+            var exists2 = doesArtistAlreadyExist(artist,rawDat[exists].children);
+            if (exists2 < 0){
+                var newSongList = new Array;
+                var newRegion = {
+                    name: artist,
+                    children: newSongList,
+                    streams: parseInt(d["Streams"])
+                };
+                rawDat[exists].children.push(newRegion);
+                //exists2 = rawSunData[exists].children.length - 1;
+            } else {
+                rawDat[exists].children[exists2].streams += parseInt(d["Streams"]);
+            }
+
+            //check if song exists in region's songlist and add to streamcount else new song
+            /*
+            var gotSong = doesSongAlreadyExist(d["Track Name"], rawSunData[exists].children[exists2].children);
+            if (gotSong < 0){
+                var song = {
+                    name: d["Track Name"],
+                    artist: d["Artist"],
+                    streams: parseInt(d["Streams"]),
+                    region: d["Region"]
+                };
+                rawSunData[exists].children[exists2].children.push(song);
+            } else {
+                rawSunData[exists].children[exists2].children[gotSong].streams += parseInt(d["Streams"]);
+            }*/
+        }
     });
 
     function doesRegionAlreadyExist(regionName){
-        for (var i = 0; i < rawSunData.length; i++){
-            if (rawSunData[i].name == regionName){
+        for (var i = 0; i < rawDat.length; i++){
+            if (rawDat[i].name == regionName){
                 return i;
             }
         }
@@ -118,9 +120,11 @@ function drawRawSunData(func){
             return (sunQuery == name);
         }
     }
+
+    return rawDat;
 }
 
-function updateChart(table){
+function updateSunburstChart(table){
     showLoading();
     //remove any existing charts
     clearChildren(document.getElementById("v1"));

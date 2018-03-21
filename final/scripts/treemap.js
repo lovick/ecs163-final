@@ -1,4 +1,4 @@
-function Treemap(container, data, initialDepartment) {
+function Treemap(container, data, updateFunc) {
 
     var margin = {
         top: 50,
@@ -116,7 +116,10 @@ function Treemap(container, data, initialDepartment) {
           .style("width", (d) => Math.max(0, d.x1 - d.x0 - 1) + "px")
           .style("height", (d) => Math.max(0, d.y1 - d.y0  - 1) + "px")
           .style("background", (d) => color(d.parent.data.name))
-          .text((d) => d.data.key);
+          .text((d) => d.data.key)
+          .on("click", function(d) {
+            updateFunc(d);
+          });
           // .append('div')
           // .style("font-size", function(d) {
           //     // compute font size based on sqrt(area)
