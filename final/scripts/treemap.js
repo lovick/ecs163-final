@@ -83,7 +83,7 @@ function Treemap(container, data, updateFunc) {
                       children: group.values
                     }})
                 };
-    console.log(result);
+    //console.log(result);
 
     var margin = {top: 40, right: 10, bottom: 10, left: 10},
       width = (innerWidth - margin.left - margin.right) * 0.45,
@@ -138,6 +138,7 @@ function Treemap(container, data, updateFunc) {
         .style('font-weight', 'bold')
         .attr('x', 10)
         .attr('y', -10)
+        .attr("fill", "#fff")
         .text('Legend');
 
 
@@ -172,6 +173,7 @@ function Treemap(container, data, updateFunc) {
         .attr('y', 15).text(function (d) {
             return d;
         })
+        .attr("fill", "#fff")
         .on("click", function(d) {
             updateFunc(d);
         })

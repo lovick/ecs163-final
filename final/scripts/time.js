@@ -20,6 +20,7 @@ function timeBrush(dIn, rIn, func) {
         x.domain(d3.extent(dataIn.filter(d => d.Region == regionIn), function(d) { return new Date(d.Date); }));
 
         svg.append("g")
+            .attr("class", "timetick")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x)
                 .ticks(d3.timeMonth)
@@ -48,6 +49,7 @@ function timeBrush(dIn, rIn, func) {
                                 (height+25) + ")")
             .style("text-anchor", "middle")
             .style("font-size", "10px")
+            .attr("fill", "#fff")
             .text("Click and drag above to change the timeframe"); 
     }
 

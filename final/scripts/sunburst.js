@@ -158,7 +158,7 @@ function updateSunburstChart(table){
         .enter().append("g")
         .attr("class", "node").append("path")
         .attr("d", arc)
-        .style("stroke", "#fff")    //TODO: change color of stroke later
+        .style("stroke", "#001514")    //TODO: change color of stroke later
         .style("fill", function(d){ return color((d.children ? d: d.parent).data.name); })
         .on("click", clickSun)
         .on("mouseover", function(d){
