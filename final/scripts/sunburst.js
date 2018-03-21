@@ -4,20 +4,10 @@ var keys =  ["Philippines", "United States", "Germany", "Brazil", "Sweden", "Mex
     "Spain", "Netherlands", "United Kingdom", "Australia", "Global", "Unselected"];
 var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
 
-var mapdata = {
-    PHL: { fillKey: 'Overdue' },
-    USA: { fillKey: 'Overdue' },
-    DEU: { fillKey: 'Overdue' },
-    BRA: { fillKey: 'Overdue' },
-    SWE: { fillKey: 'Overdue' },
-    MEX: { fillKey: 'Overdue' },
-    ESP: { fillKey: 'Overdue' },
-    NLD: { fillKey: 'Overdue' },
-    GBR: { fillKey: 'Overdue' },
-    AUS: { fillKey: 'Overdue' }
-};
-
 var sunburstUpdate;
+var sunMapColors = ["#5db1f6",
+    "#316799",
+    "#656e74"];
 
 function drawRawSunData(datIn, func){
     //console.log(func);
@@ -28,7 +18,6 @@ function drawRawSunData(datIn, func){
     sunTable = {"name": "table", "children": rawSunData};
     changeSunQueryLabel(0);
     updateSunburstChart(sunTable);
-
 }
 
 
@@ -138,6 +127,7 @@ function updateSunburstChart(table){
         y = d3.scaleSqrt().range([0, radius]),
         formatNumber = d3.format(",d");
 
+    //add svg to div container
     var svg = d3.select("#v1").append("svg").attr("width", width).attr("height", height)
         .append("g")
         .attr("transform", "translate(" + (width/2) + "," + (height/2) + ")");
@@ -147,18 +137,20 @@ function updateSunburstChart(table){
     root.sum(function(d){ return d.streams; });
     partition(root);
 
+    //draw arc in designated area
     var arc = d3.arc()
         .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x0))); })
         .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, x(d.x1))); })
         .innerRadius(function(d) { return Math.max(0, y(d.y0)); })
         .outerRadius(function(d) { return Math.max(0, y(d.y1)); });
 
+    //add data arcs to svg and make interactive
     svg.selectAll("path")
         .data(partition(root).descendants())
         .enter().append("g")
         .attr("class", "node").append("path")
         .attr("d", arc)
-        .style("stroke", "#001514")    //TODO: change color of stroke later
+        .style("stroke", "#001514")
         .style("fill", function(d){ return color((d.children ? d: d.parent).data.name); })
         .on("click", clickSun)
         .on("mouseover", function(d){
@@ -189,6 +181,7 @@ function updateSunburstChart(table){
         });
     
 
+    //add preliminary text labels for countries only
     svg.selectAll(".node")
         .append("text")
         .attr("fill", function(d){
@@ -222,6 +215,7 @@ function updateSunburstChart(table){
         });
 
 
+    //function for change in query behavior upon interaction
     function clickSun(d){
         if (d.depth > 2){
             return;
@@ -276,24 +270,28 @@ function updateSunburstChart(table){
     setTimeout(showSunBurst, 1000);
 }
 
+//take out loading screens and display vis
 function showSunBurst(){
     document.getElementById("loader").style.display = "none";
     document.getElementById("v1").style.display = "block";
     document.getElementById("v1_query").style.display = "block";
 }
 
+//take out previous vis and display loading
 function showLoading(){
     document.getElementById("v1").style.display = "none";
     document.getElementById("v1_query").style.display = "none";
     document.getElementById("loader").style.display = "block";
 }
 
+//erase children in an element to make room for new ones
 function clearChildren(element){
     while (element.firstChild){
         element.removeChild(element.firstChild);
     }
 }
 
+//change labels indicating query
 function changeSunQueryLabel(streamcount){
     var p = document.getElementById("v1_query");
     clearChildren(p);
@@ -312,34 +310,31 @@ function changeSunQueryLabel(streamcount){
     //changeNation(sunQuery);  
 }
 
-
+//draw map to show which has been selected
 var arr = [];
 var countries;
 function drawSunMap(){
     var width = innerWidth*0.45,
         height = innerHeight*0.35;
 
-    var projection = d3.geoKavrayskiy7()
-        .scale(100)
-        .translate([width / 2, height / 2])
-        .precision(.1);
+    var projection = d3.geoKavrayskiy7().scale(100)
+        .translate([width / 2, height / 2]).precision(.1);
 
     var path = d3.geoPath().projection(projection);
 
     d3.select("#sunmap").append("p")
             .style("position", "relative")
             .style("margin-top", '0px')
-            .style("left", '380px')
+            .style("left", innerWidth*.20 + "px")
             // .style("bottom", "50px")
-            .attr("text-anchor", "middle")
+            .attr("text-align", "center")
             .text("Selected Region");
 
     var svg = d3.select("#sunmap").append("svg")
         .attr("width", width)
         .attr("height", height);
 
-
-        
+    //draw map data given topojson
     queue()
         .defer(d3.json, "./world-110m.json")
         .defer(d3.tsv, "./world-country-names.tsv")
@@ -350,28 +345,29 @@ function drawSunMap(){
 
         countries = topojson.feature(world, world.objects.countries).features;
 
-        //map country names to IDs used on map
+        //bind names to countries
         arr=[];
         names.forEach(function(i){
             //console.log(i.name);
             arr[i.id]=i.name;
         });
 
+        //draw the countries from topojson data
         svg.selectAll(".country")
             .data(countries)
             .enter().insert("path", ".graticule")
             .attr("class", "suncountry")
             .attr("d", path)
-            .style("fill", function(d, i) {
+            .style("fill", function(d) {
                 var n = arr[d.id];
                 var sq = keys[skeys.indexOf(sunQuery)];
                 if (keys.indexOf(n) >= 0){
                     if (sq == n){
-                        return "#1e3699";
+                        return sunMapColors[0];
                     }
-                    return "#86BBD8";
+                    return  sunMapColors[1];
                 } else {
-                    return "#CCCCCC";
+                    return  sunMapColors[2];
                 }
             })
             /*.on("click", function(d, i) {
@@ -393,26 +389,25 @@ function drawSunMap(){
             .attr("class", "boundary")
             .attr("d", path);
     }
-
-    d3.select(self.frameElement).style("height", height + "px");
 }
 
+//changes map color according to selection
 function changeNation(nat){
     d3.select("#sunmap").selectAll(".suncountry")
         .style("fill", function(d, i){
             if (nat == "global"){
-                return "#1e3699";
-            }
+                return  sunMapColors[0];
+            }   //colors all countries if global is chosen
 
             var n = arr[d.id];
             var sq = keys[skeys.indexOf(nat)];
             if (keys.indexOf(n) >= 0){
                 if (sq == n){
-                    return "#1e3699";
+                    return  sunMapColors[0];
                 }
-                return "#86BBD8";
+                return  sunMapColors[1];
             } else {
-                return "#CCCCCC";
+                return  sunMapColors[2];
             }
         })
 }

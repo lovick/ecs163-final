@@ -100,7 +100,8 @@ function Treemap(container, data, updateFunc) {
     //         .text("Distribution of Popular Genres and Top Artists");
     container.append("p")
             .style("margin-top", '0px')
-            .style("margin-bottom", '0px')
+            .style("margin-bottom", '8px')
+            .style("margin-left", "8px")
             .style("top", margin.top + "px")
             .text("Distribution of Popular Genres and Top Artists");
 

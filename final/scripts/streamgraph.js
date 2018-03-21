@@ -217,8 +217,7 @@ function Streamgraph(container, data) {
    container.append("p")
             .style("position", "relative")
             .style("margin-top", '0px')
-            .style("left", '400px')
+            .style("text-align", 'center')
             .style("bottom", '45px')
-            .attr("text-anchor", "middle")
             .text("Top 50 Songs by Region Yearly Performance");
 }
