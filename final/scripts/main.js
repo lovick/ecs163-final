@@ -51,12 +51,16 @@ function sunburstUpdate(query) {
     // update just like map
     // change region for streamgraph and treemap
     // change curRegion
-    console.log(query);
+    console.log(query + "; " + curRegion);
     changeNation(query);
-
     var sunFormat = getSunFormat(dat.filter(d => { return d.Region == curRegion; }));
     console.log("Sunburst Update for Treemap");
-    treemap = new Treemap(d3.select("#treemap"), dat.filter(d => { return d.Region == curRegion; }), treemapUpdate);
+    treemap = new Treemap(d3.select("#treemap"), dat.filter(d => { 
+        var q = query; 
+        if (q == "table") {
+            q = "global"
+        } 
+        return d.Region == q; }), treemapUpdate);
 }
 
 function treemapUpdate(genre) {
