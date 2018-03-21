@@ -42,27 +42,35 @@ d3.csv('dataWithGenres.csv',
 
 var parseDate = d3.timeParse("%m/%d/%y");
 
+function getSunFormat(newDat) {
+    return {"name": "table", "children": transformToSunburst(newDat)};
+}
+
 function sunburstUpdate(query) {
     // update just like map
     // change region for streamgraph and treemap
     // change curRegion
+    
 }
 
 function treemapUpdate(genre) {
-    // update streamgraph
+    // update streamgraph and sunburst
     console.log(genre);
+    var sunFormat = getSunFormat(dat.filter(d => { return d.genre == genre; }));
+    
+    console.log("Treemap Update Sunburst");
+    updateSunburstChart(sunFormat);
 }
 
 function timeUpdate(start, end) {
     // update streamgraph, treemap, and sunburst to show only data from that timerange
     console.log(start + "; " + end);
-    var newDat = dat.filter(d => {return new Date(d.Date) > start && new Date(d.Date) < end});
-    var sunFormat = {"name": "table", "children": transformToSunburst(newDat)};
+    var sunFormat = getSunFormat(dat.filter(d => { return new Date(d.Date) > start && new Date(d.Date) < end; }));
 
     console.log("Time Update for Sunburst");
     updateSunburstChart(sunFormat);
     console.log("Time Update for Treemap");
-    treemap = new Treemap(d3.select("#treemap"), newDat.filter(d => { return d.Region == curRegion; }));
+    treemap = new Treemap(d3.select("#treemap"), newDat.filter(d => { return d.Region == curRegion; }), treemapUpdate);
     // some streamgraph shit
 
 }

@@ -119,7 +119,7 @@ function Treemap(container, data, updateFunc) {
           .style("background", (d) => color(d.parent.data.name))
           .text((d) => d.data.key)
           .on("click", function(d) {
-            updateFunc(d);
+            updateFunc(d.parent.data.name);
           });
           // .append('div')
           // .style("font-size", function(d) {
