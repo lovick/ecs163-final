@@ -82,7 +82,7 @@ function Treemap(container, data, updateFunc) {
                       name: group.key,
                       children: group.values
                     }})
-                }
+                };
     console.log(result);
 
     var margin = {top: 40, right: 10, bottom: 10, left: 10},
@@ -90,6 +90,7 @@ function Treemap(container, data, updateFunc) {
       height = (innerHeight - margin.top - margin.bottom) * 0.5,
       color = d3.scaleOrdinal().range(d3.schemeCategory20c);
 
+    container.selectAll("*").remove();
     var div = container.append("div")
             .style("position", "relative")
             .style("width", (width + margin.left + margin.right) + "px")

@@ -45,6 +45,7 @@ var parseDate = d3.timeParse("%m/%d/%y");
 function sunburstUpdate(query) {
     // update just like map
     // change region for streamgraph and treemap
+    // change curRegion
 }
 
 function treemapUpdate(genre) {
@@ -57,7 +58,13 @@ function timeUpdate(start, end) {
     console.log(start + "; " + end);
     var newDat = dat.filter(d => {return new Date(d.Date) > start && new Date(d.Date) < end});
     var sunFormat = {"name": "table", "children": transformToSunburst(newDat)};
+
+    console.log("Time Update for Sunburst");
     updateSunburstChart(sunFormat);
+    console.log("Time Update for Treemap");
+    treemap = new Treemap(d3.select("#treemap"), newDat.filter(d => { return d.Region == curRegion; }));
+    // some streamgraph shit
+
 }
 
 function streamgraphUpdate(value) {
