@@ -64,6 +64,7 @@ function treemapUpdate(genre) {
 
 function timeUpdate(start, end) {
     // update streamgraph, treemap, and sunburst to show only data from that timerange
+    artistQuery = ""
     console.log(start + "; " + end);
     var sunFormat = getSunFormat(dat.filter(d => { return new Date(d.Date) > start && new Date(d.Date) < end; }));
 

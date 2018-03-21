@@ -26,7 +26,7 @@ function drawRawSunData(datIn, func){
 
     //initialize chart
     sunTable = {"name": "table", "children": rawSunData};
-    changeSunQueryLabel();
+    changeSunQueryLabel(0);
     updateSunburstChart(sunTable);
 
 }
@@ -34,7 +34,7 @@ function drawRawSunData(datIn, func){
 
 function transformToSunburst(data) {
     var rawDat = new Array;
-    console.log(data);
+    //console.log(data);
     data.forEach(function (d){
         var date = d["Date"];
 
@@ -227,6 +227,7 @@ function updateSunburstChart(table){
         } else if (d.depth < 1){
             sunQuery = "table";
             artistQuery = "";
+            changeSunQueryLabel(0);
         } else if (d.depth == 1) {
             if (d.data.name != sunQuery){
                 sunQuery = d.data.name;
@@ -238,17 +239,17 @@ function updateSunburstChart(table){
                 sunQuery = "table";
                 artistQuery = "";
             }
+            changeSunQueryLabel(0);
         } else if (d.depth == 2){
+            console.log(d.data.name);
             if (d.data.name != artistQuery){
                 sunQuery = d.parent.data.name;
                 artistQuery = d.data.name;
-            } else {
+                changeSunQueryLabel(formatNumber(d.data.streams));
             }
         }
-        changeSunQueryLabel();
         transitionSun(d);
-        //TODO: signal change to other viz here
-        console.log(sunQuery);
+        //console.log(sunQuery);
         sunburstUpdate(sunQuery);
     }
     function transitionSun(d){
@@ -286,7 +287,7 @@ function clearChildren(element){
     }
 }
 
-function changeSunQueryLabel(){
+function changeSunQueryLabel(streamcount){
     var p = document.getElementById("v1_query");
     clearChildren(p);
     var keys =  ["Philippines", "USA", "Germany", "Brazil", "Sweden", "Mexico",
@@ -294,7 +295,7 @@ function changeSunQueryLabel(){
     var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
     var string = keys[skeys.indexOf(sunQuery)];
     if (artistQuery.length > 0){
-        string += " > " + artistQuery;
+        string += " > " + artistQuery + " (" + streamcount + " streams)";
     }
 
     var text = document.createElement("p");
@@ -367,8 +368,6 @@ function drawSunMap(){
 }
 
 function changeNation(nat){
-    console.log("here from drawsunmap");
-
     d3.select("#sunmap").selectAll(".suncountry")
         .style("fill", function(d, i){
             if (nat == "global"){
