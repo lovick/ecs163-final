@@ -88,7 +88,7 @@ function Treemap(container, data, updateFunc) {
     var margin = {top: 40, right: 10, bottom: 10, left: 10},
       width = (innerWidth - margin.left - margin.right) * 0.45,
       height = (innerHeight - margin.top - margin.bottom) * 0.5,
-      color = d3.scaleOrdinal().range(d3.schemeCategory20c);
+      color = d3.scaleOrdinal().range(d3.schemeCategory20);
 
     container.selectAll("*").remove();
     var div = container.append("div")

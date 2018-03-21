@@ -139,3 +139,8 @@ form {
   border: 1px solid black;
   text-align: center;
 }
+
+#reset {
+  grid-column: 2;
+  grid-row: 2;
+}

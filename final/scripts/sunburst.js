@@ -133,7 +133,7 @@ function updateSunburstChart(table){
     var width = innerWidth*0.33,
         height = innerHeight*0.45,
         radius = (Math.min(width, height)/2 ) - 10;
-    var color = d3.scaleOrdinal(d3.schemeCategory20),
+    var color = d3.scaleOrdinal(d3.schemeCategory20b),
         x = d3.scaleLinear().range([0, 2 * Math.PI]),
         y = d3.scaleSqrt().range([0, radius]),
         formatNumber = d3.format(",d");
