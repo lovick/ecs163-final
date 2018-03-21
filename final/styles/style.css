@@ -88,6 +88,8 @@ form {
 #streamgraph {
   grid-row: 1;
   grid-column: 1;
+  margin-left: 10px;
+  margin-top: -80px;
 }
 
 #time {
@@ -98,7 +100,10 @@ form {
 #sunmap{
   grid-row: 1;
   grid-column: 2;
+  margin-left: -35px;
+  margin-top: 50px;
 }
+
 /*Map*/
 .stroke {
   fill: none;
@@ -121,4 +126,16 @@ form {
   fill: none;
   stroke: #fff;
   stroke-width: .5px;
+}
+
+#tooltip { 
+  position: absolute;
+  grid-row: 1;
+  grid-column: 1;
+  z-index: 10;
+  opacity: 0;
+  background-color: white;
+  padding: 3px 5px;
+  border: 1px solid black;
+  text-align: center;
 }

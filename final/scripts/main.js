@@ -31,6 +31,7 @@ d3.csv('dataWithGenres.csv',
         sunburst = new drawRawSunData(data, sunburstUpdate);
         //StreamGraph.draw(data, 'orange');
         time = new timeBrush(data, curRegion, timeUpdate);
+        streamgraph = new Streamgraph(d3.select("#streamgraph"), newdata);
 
         // var sunburstChart = new SunburstChart(d3.select(".vis1"), data, function() {});
         // var parallelChart = new ParallelChart(d3.select(".vis3"), data, function() {
@@ -78,6 +79,7 @@ function timeUpdate(start, end) {
     updateSunburstChart(sunFormat);
     console.log("Time Update for Treemap");
     treemap = new Treemap(d3.select("#treemap"), newDat, treemapUpdate);
+    streamgraph = new Streamgraph(d3.select("#streamgraph"), newDat);
     // some streamgraph shit
 
 }

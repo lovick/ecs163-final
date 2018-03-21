@@ -1,7 +1,7 @@
 function timeBrush(dIn, rIn, func) {
 
-    var margin = {top: 0, right: 50, bottom: 50, left: 50},
-        width = (innerWidth - margin.left - margin.right)*0.75,
+    var margin = {top: 0, right: 50, bottom: 50, left: 10},
+        width = (innerWidth - margin.left - margin.right)*0.60,
         height = (innerHeight - margin.top - margin.bottom)*0.05;
 
     var x = d3.scaleTime().rangeRound([0, width]);
@@ -47,6 +47,7 @@ function timeBrush(dIn, rIn, func) {
                     "translate(" + (width/2) + " ," + 
                                 (height+25) + ")")
             .style("text-anchor", "middle")
+            .style("font-size", "10px")
             .text("Click and drag above to change the timeframe"); 
     }
 

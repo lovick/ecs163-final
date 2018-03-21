@@ -309,8 +309,8 @@ function changeSunQueryLabel(streamcount){
 var arr = [];
 var countries;
 function drawSunMap(){
-    var width = 560,
-        height = 400;
+    var width = innerWidth*0.45,
+        height = innerHeight*0.35;
 
     var projection = d3.geoKavrayskiy7()
         .scale(100)
@@ -357,7 +357,7 @@ function drawSunMap(){
                     return "#CCCCCC";
                 }
             })
-            .on("click", function(d, i) {
+            /*.on("click", function(d, i) {
                 console.log("Clicking in map");
                 var n = arr[d.id];
                 var sq = keys[skeys.indexOf(d.id)];
@@ -368,7 +368,7 @@ function drawSunMap(){
                 }
                 artistQuery = "";
                 sunburstUpdate(sunQuery);
-            })
+            })*/
             ;
 
         svg.insert("path", ".graticule")

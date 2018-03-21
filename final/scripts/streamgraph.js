@@ -1,243 +1,216 @@
-var StreamGraph = (function () {
-    var datearray = [];
-    var colorrange = [];
+function Streamgraph(container, data) {
 
-    function draw(appData, color) {
-        if (color == "blue") {
-            colorrange = ["#045A8D", "#2B8CBE", "#74A9CF", "#A6BDDB", "#D0D1E6", "#F1EEF6"];
-        }
-        else if (color == "pink") {
-            colorrange = ["#980043", "#DD1C77", "#DF65B0", "#C994C7", "#D4B9DA", "#F1EEF6"];
-        }
-        else if (color == "orange") {
-            colorrange = ["#B30000", "#E34A33", "#FC8D59", "#FDBB84", "#FDD49E", "#FEF0D9"];
-        }
-        strokecolor = colorrange[0];
+    var margin = {
+        top: 50,
+        right: 50,
+        bottom: 30,
+        left: 80
+    };
 
-        //var format = d3.time.format("%m/%d/%y");
-        var format = d3.timeParse("%m/%d/%y");
-
-        var margin = {top: 20, right: 40, bottom: 30, left: 30};
-        var width = 1000;
-        var height = 800 - margin.top - margin.bottom;
-
-        var tooltip = d3.select("body")
-            .append("div")
-            .attr("class", "remove")
-            .style("position", "absolute")
-            .style("z-index", "20")
-            .style("visibility", "hidden")
-            .style("top", "30px")
-            .style("left", "55px");
-
-        var x = d3.scaleTime()
-            .range([0, width]);
-
-        var y = d3.scaleLinear()
-            .range([height - 10, 0]);
-
-        var z = d3.scaleOrdinal()
-            .range(colorrange);
-
-        var xAxis = d3.axisBottom()
-            .scale(x)
-            //.orient("bottom")
-            .ticks(d3.timeWeeks);
-
-        var yAxis = d3.axisLeft()
-            .scale(y);
-
-        var yAxisr = d3.axisRight()
-            .scale(y);
-
-        var stack = d3.layout.stack()
-            .offset("silhouette")
-            .values(function (d) {
-                return d.values;
-            })
-            .x(function (d) {
-                return d.date;
-            })
-            .y(function (d) {
-                return d.value;
-            });
-
-        var nest = d3.nest()
-            .key(function (d) {
-                return d.TrackName;
-            });
-
-        var area = d3.svg.area()
-            .interpolate("cardinal")
-            .x(function (d) {
-                return x(d.date);
-            })
-            .y0(function (d) {
-                return y(d.y0);
-            })
-            .y1(function (d) {
-                return y(d.y0 + d.y);
-            });
-
-        var svg = d3.select(".chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        
-        var idx = 0;
-        var hashMap = {};
-        appData.forEach(function (d) {
-            if (!hashMap.hasOwnProperty(d.TrackName)) {
-                hashMap[d.TrackName] = 0;
-            } else {
-                hashMap[d.TrackName]++;
-            }
-        });
-
-        var keys = [];
-        for (var key in hashMap) {
-            if (hashMap.hasOwnProperty(key)) {
-                keys.push([key, hashMap[key]])
-            }
-        }
-
-        keys.sort(function (a, b) {
-            return a[1] - b [1];
-        });
-
-        var topFiftySongMap = [];
-        for (var keyIdx = keys.length - 1; keyIdx >= keys.length - 50; keyIdx--) {
-            topFiftySongMap.push(keys[keyIdx]);
-        }
-		console.log(topFiftySongMap);
-        var songsData = appData.filter(function (d) {
-            return topFiftySongMap.some(function (internalArr) {
-                if (d.TrackName === internalArr[0]) {
-                    return d;
-                }
-            });
-        });
-
-        var getAvg = d3.mean(songsData, function (d) {
-            return d.Streams
-        });
-        songsData.some(function (d) {
-            d.date = format.parse(d.date);
-            d.value = d.Streams / getAvg;
-        });
-
-        console.log(songsData);
-
-        var layers = stack(nest.entries(songsData));
-
-        x.domain(d3.extent(songsData, function (d) {
-            return d.date;
-        }));
-        y.domain([0, d3.max(songsData, function (d) {
-            return d.y0 + d.y;
-        })]);
-
-        svg.selectAll(".layer")
-            .data(layers)
-            .enter().append("path")
-            .attr("class", "layer")
-            .attr("d", function (d) {
-                return area(d.values);
-            })
-            .style("fill", function (d, i) {
-                return z(i);
-            });
-
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .attr("transform", "translate(" + width + ", 0)")
-            .call(yAxis.orient("right"));
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis.orient("left"));
-
-        svg.selectAll(".layer")
-            .attr("opacity", 1)
-            .on("mouseover", function (d, i) {
-                svg.selectAll(".layer").transition()
-                    .duration(250)
-                    .attr("opacity", function (d, j) {
-                        return j != i ? 0.6 : 1;
+    var top50data = d3.nest().key(function(d){
+                    return d.Track;
+                  })
+                  .rollup(function(leaves){
+                        return d3.sum(leaves, function(d) {return (d.Streams)});
                     })
-            })
+                  .entries(data)
 
-            .on("mousemove", function (d, i) {
-                mousex = d3.mouse(this);
-                mousex = mousex[0];
-                var invertedx = x.invert(mousex);
-                invertedx = invertedx.getMonth() + invertedx.getDate();
-                var selected = (d.values);
-                for (var k = 0; k < selected.length; k++) {
-                    datearray[k] = selected[k].date
-                    datearray[k] = datearray[k].getMonth() + datearray[k].getDate();
+    top50data.sort(function(x, y){
+        return d3.descending(x.value, y.value);
+    })
+
+    //console.log(newdata);
+    var top50data = top50data.slice(0, 50);
+
+    top50 = []
+    top50data.forEach(function(item, index) {
+        top50.push(item.key);
+    });
+
+    filtered_data = data.filter(val => {return top50.includes(val.Track); });
+
+    var newdata = d3.nest().key(function(d){
+                    // return d.genre;
+                    return d.Track;
+                  })
+                    .key(function(d){
+                    return d.Date;
+                  })
+                  .rollup(function(leaves){
+                        return d3.sum(leaves, function(d) {return (d.Streams)});
+                    })
+                  .entries(data)
+    console.log(newdata);
+
+    //x.domain(d3.extent(dataIn.filter(d => d.Region == regionIn), function(d) { return new Date(d.Date); }));
+    var range = d3.extent(newdata, function(d) { return new Date(d.Date); });
+
+    newdata.forEach(function(item, index) {
+
+    	var start_date = range[0];
+    	var end_date = range[1];
+
+		var day;
+    	while(start_date <= end_date) { 
+    		export_date = (start_date.getMonth()+1)+'/'+start_date.getDate()+'/'+start_date.getFullYear();
+    		day = start_date.getDate()
+    		start_date = new Date(start_date.setDate(++day));
+    		var found = item.values.find(function(element) {
+  				return element.key === export_date;
+			}) 
+			if (!found) {
+	    		item.values.push({key:export_date, value:0});
+    		}
+		}
+    });
+
+    var result = d3.nest()
+        .key(function(d) {
+            return d.Date;
+        })
+        .key(function(d){
+                    return d.Track;
+                  })
+        .rollup(function(leaves){
+                        return d3.sum(leaves, function(d) {return (d.Position)});
+                    })
+        .entries(filtered_data);
+
+    // console.log(result);
+
+    result.forEach(function(item, index) {
+        var list50 = top50.slice(0);
+        item.values.forEach(function(item2, index2){
+            item2.value = 51-item2.value;
+            if(list50.includes(item2.key)){
+                list50.splice(list50.indexOf(item2.key), 1);
+            }
+        });
+        for(var artist of list50) {
+            item.values.push({key:artist, value:0});
+        }
+    });
+
+    // console.log(result);
+
+    result.sort(function(a,b){
+    return new Date(a.key) - new Date(b.key);
+    });
+
+
+    var result2 = []
+    result.forEach(function(item, index) {
+        var obj = {date: new Date(item.key)};
+        item.values.forEach(function(item, i) {
+            obj[item.key] = item.value;
+        });
+        result2.push(obj);
+    });
+
+    // console.log(result2);
+
+    var stack = d3.stack()
+    .keys(top50)
+    .order(d3.stackOrderNone)
+    .offset(d3.stackOffsetWiggle);
+
+    // console.log(data);
+    var series = stack(result2);
+    // console.log(series);
+
+    var width = innerWidth*0.57,
+    height = innerHeight*0.5;
+
+    var x = d3.scaleTime()
+        .domain(d3.extent(result2, function(d){ return d.date; }))
+        .range([0, width]);
+
+    // setup axis
+    var xAxis = d3.axisBottom(x);
+
+    var max = d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); });
+    var y = d3.scaleLinear()
+        .domain([-max, d3.max(series, function(layer) { return d3.max(layer, function(d){ return d[0] + d[1];}); })])
+        .range([height, 0]);
+
+    var color = d3.scaleOrdinal().range(d3.schemeCategory20c);
+
+    var area = d3.area()
+        .x(function(d) { return x(d.data.date); })
+        .y0(function(d) { return y(d[0]); })
+        .y1(function(d) { return y(d[1]); })
+        .curve(d3.curveBasis);
+
+    container.selectAll("*").remove();
+
+    var svg = container.append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    svg.selectAll("path")
+        .data(series)
+        .enter().append("path")
+        .attr("d", area)
+        .style("fill", function() { return color(Math.random()); })
+        .text("test")
+        ;
+
+    svg.append("g")
+                .attr("class", "axis axis--x")
+                .attr("transform", "translate(0," + (height) + ")")
+                .call(xAxis); 
+
+                svg.selectAll("path")
+                .attr("opacity", 1)
+                .on("mouseover", mouseOverArc)
+                .on("mousemove", mouseMoveArc)
+                .on("mouseout", mouseOutArc);
+    
+                var tooltip = d3.select("#tooltip")
+    
+                function mouseOverArc(d, i) {
+    
+                        svg.selectAll("path").transition()
+                        .duration(250)
+                        .attr("opacity", function (d, j) {
+                            return j != i ? 0.6 : 1;
+                        })
+                        // d3.select(this).attr("stroke","black")
+                         mousex = d3.mouse(this);
+                         mousex = mousex[0];
+                        var invertedx = x.invert(mousex);
+                //     // invertedx = invertedx.getMonth() + invertedx.getDate();
+                        invertedx = (invertedx.getMonth()+1)+'/'+invertedx.getDate()+'/'+invertedx.getFullYear();
+    
+                      tooltip.style("visibility", "visible");
+                      tooltip.html(d.key + '\n' + invertedx);
+                      // tooltip.html(d.key + "<br>" + invertedx);
+                      return tooltip.transition()
+                        .duration(50)
+                        .style("opacity", 0.9);
+                    }
+    
+                function mouseOutArc(){
+                    d3.select(this).attr("stroke","")
+                    return tooltip.style("visibility", "hidden");
                 }
+    
+                function mouseMoveArc (d) {
+    
+                        mousex = d3.mouse(this);
+                         mousex = mousex[0];
+                        var invertedx = x.invert(mousex);
+                //     // invertedx = invertedx.getMonth() + invertedx.getDate();
+                        invertedx = (invertedx.getMonth()+1)+'/'+invertedx.getDate()+'/'+invertedx.getFullYear();
+    
+    
+                      tooltip.style("visibility", "visible");
+                      tooltip.html(d.key + '\n' + invertedx);
+    
+                          return tooltip
+                            .style("top", (d3.event.pageY-10)+"px")
+                            .style("left", (d3.event.pageX+10)+"px");
+                }
+    
 
-                mousedate = datearray.indexOf(invertedx);
-                pro = d.values[mousedate].value;
-
-                
-                d3.select(this)
-                    .classed("hover", true)
-                    .attr("stroke", strokecolor)
-                    .attr("stroke-width", "0.5px"),
-                    tooltip.html("<p>" + "Track: " + d.values[mousedate].TrackName + "<br>" +  "Artist: " +
-                     d.values[mousedate].Artist + "<br>" + "Stream Count: " + d.values[mousedate].Streams + "<br>" +
-                     "Date: " + d.values[mousedate].date + "</p>")
-                    .style("visibility", "visible");
-
-            })
-            .on("mouseout", function (d, i) {
-           
-                svg.selectAll(".layer")
-                    .transition()
-                    .duration(250)
-                    .attr("opacity", "1");
-                d3.select(this)
-                    .classed("hover", false)
-                    .attr("stroke-width", "0px"), tooltip.html("<p>" + d.values[mousedate].TrackName + "<br>" + pro + "</p>").style("visibility", "hidden");
-            })
-
-        var vertical = d3.select(".chart")
-            .append("div")
-            .attr("class", "remove")
-            .style("position", "absolute")
-            .style("z-index", "19")
-            .style("width", "1px")
-            .style("height", "380px")
-            .style("top", "10px")
-            .style("bottom", "30px")
-            .style("left", "0px")
-            .style("background", "#fff");
-
-        d3.select(".chart")
-            .on("mousemove", function () {
-                mousex = d3.mouse(this);
-                mousex = mousex[0] + 5;
-                vertical.style("left", mousex + "px")
-            })
-            .on("mouseover", function () {
-                mousex = d3.mouse(this);
-                mousex = mousex[0] + 5;
-                vertical.style("left", mousex + "px")
-            });
-      
-    }
-
-    return {
-        draw: draw
-    }
-})();
+}
