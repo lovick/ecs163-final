@@ -214,6 +214,11 @@ function Streamgraph(container, data) {
                             .style("top", (d3.event.pageY-10)+"px")
                             .style("left", (d3.event.pageX+10)+"px");
                 }
-    
-
+   container.append("p")
+            .style("position", "relative")
+            .style("margin-top", '0px')
+            .style("left", '400px')
+            .style("bottom", '45px')
+            .attr("text-anchor", "middle")
+            .text("Top 50 Songs by Region Yearly Performance");
 }

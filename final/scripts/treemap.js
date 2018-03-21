@@ -91,12 +91,18 @@ function Treemap(container, data, updateFunc) {
       color = d3.scaleOrdinal().range(d3.schemeCategory20);
 
     container.selectAll("*").remove();
-
     // container.append("p")
+    //         .style("position", "relative")
     //         .style("margin-top", '0px')
     //         .style("margin-bottom", '0px')
     //         .style("top", margin.top + "px")
+    //          // .attr("text-anchor", "left")
     //         .text("Distribution of Popular Genres and Top Artists");
+    container.append("p")
+            .style("margin-top", '0px')
+            .style("margin-bottom", '0px')
+            .style("top", margin.top + "px")
+            .text("Distribution of Popular Genres and Top Artists");
 
     var div = container.append("div")
             .style("position", "relative")
@@ -169,7 +175,6 @@ function Treemap(container, data, updateFunc) {
         .attr('y', -10)
         .attr("fill", "#fff")
         .text('Legend');
-
 
     var legend = [];
     result.children.forEach(function(part, index, theArray) {

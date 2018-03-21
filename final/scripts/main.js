@@ -61,6 +61,13 @@ function sunburstUpdate(query) {
             q = "global"
         } 
         return d.Region == q; }), treemapUpdate);
+    streamgraph = new Streamgraph(d3.select("#streamgraph"), dat.filter(d => { 
+        var q = query; 
+        if (q == "table") {
+            q = "global"
+        } 
+    return d.Region == q; }));
+
 }
 
 function treemapUpdate(genre) {
@@ -84,16 +91,16 @@ function timeUpdate(start, end) {
     console.log("Time Update for Treemap");
     treemap = new Treemap(d3.select("#treemap"), newDat, treemapUpdate);
     streamgraph = new Streamgraph(d3.select("#streamgraph"), newDat);
-    // some streamgraph shit
+    
 
 }
 
 function streamgraphUpdate(value) {
-    // wait fuck this there's nothing to do with this
+    //
 }
 
 function reset() {
     location.reload();
 }
 
-drawSunMap();   //map should not be changed and is only affected by sunburst but must be declared globally bc this method is a bitch to work with
+drawSunMap();   

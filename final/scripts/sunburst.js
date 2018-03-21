@@ -187,6 +187,7 @@ function updateSunburstChart(table){
             }
             return s;
         });
+    
 
     svg.selectAll(".node")
         .append("text")
@@ -219,7 +220,7 @@ function updateSunburstChart(table){
                 }
             }
         });
-    //console.log(table);
+
 
     function clickSun(d){
         if (d.depth > 2){
@@ -266,6 +267,12 @@ function updateSunburstChart(table){
     }
 
     //showSunBurst();
+    d3.select("#v1_sunburst").append("p")
+            .style("position", "relative")
+            .style("margin-top", '0px')
+            .style("left", '160px')
+            .attr("text-anchor", "middle")
+            .text("Regional Distribution of Artists and Songs");
     setTimeout(showSunBurst, 1000);
 }
 
@@ -319,10 +326,20 @@ function drawSunMap(){
 
     var path = d3.geoPath().projection(projection);
 
+    d3.select("#sunmap").append("p")
+            .style("position", "relative")
+            .style("margin-top", '0px')
+            .style("left", '380px')
+            // .style("bottom", "50px")
+            .attr("text-anchor", "middle")
+            .text("Selected Region");
+
     var svg = d3.select("#sunmap").append("svg")
         .attr("width", width)
         .attr("height", height);
 
+
+        
     queue()
         .defer(d3.json, "./world-110m.json")
         .defer(d3.tsv, "./world-country-names.tsv")
