@@ -1,29 +1,16 @@
 var rawSunData, sunTable = new Array, sunQuery = "table";  //default has all available countries, all available songs
 var mapSVG, artistQuery = "";
 drawRawSunData();
-var keys =  ["PHL", "USA", "DEU", "BRA", "SWE", "MEX", "ESP", "NLD", "GBR", "AUS"];
-var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global"];
-
-var mapdata = {
-    PHL: { fillKey: 'Overdue' },
-    USA: { fillKey: 'Overdue' },
-    DEU: { fillKey: 'Overdue' },
-    BRA: { fillKey: 'Overdue' },
-    SWE: { fillKey: 'Overdue' },
-    MEX: { fillKey: 'Overdue' },
-    ESP: { fillKey: 'Overdue' },
-    NLD: { fillKey: 'Overdue' },
-    GBR: { fillKey: 'Overdue' },
-    AUS: { fillKey: 'Overdue' }
-};
-
-var sunburstUpdate;
+drawSunMap();
+var keys =  ["Philippines", "United States", "Germany", "Brazil", "Sweden", "Mexico",
+    "Spain", "Netherlands", "United Kingdom", "Australia", "Global", "Unselected"];
+var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
 
 function drawRawSunData(func){
     //console.log(func);
-    sunburstUpdate = func;
     rawSunData = new Array;
     d3.csv("./filteredData.csv", function(data){
+        console.log(data);
         //load compiled data and save as a bunch of json objects to be used for later
         //TODO: change to include main.js data
         data.forEach(function (d){
@@ -63,7 +50,6 @@ function drawRawSunData(func){
                 } else {
                     rawSunData[exists].children[exists2].streams += parseInt(d["Streams"]);
                 }
-
                 //check if song exists in region's songlist and add to streamcount else new song
                 /*
                 var gotSong = doesSongAlreadyExist(d["Track Name"], rawSunData[exists].children[exists2].children);
@@ -169,9 +155,6 @@ function updateChart(table){
             var s;
             if (d.depth <= 2){
                 if (d.depth == 1){
-                    var keys =  ["Philippines", "USA", "Germany", "Brazil", "Sweden", "Mexico",
-                        "Spain", "Netherlands", "Great Britain", "Australia", "Global", "Unselected"];
-                    var skeys = ["ph", "us", "de", "br", "se", "mx", "es", "nl", "gb", "au", "global", "table"];
                     s = keys[skeys.indexOf(d.data.name)];
                 } else {
                     s = d.data.name;
@@ -244,7 +227,7 @@ function updateChart(table){
         changeSunQueryLabel();
         transitionSun(d);
         //TODO: signal change to other viz here
-        console.log(sunQuery);
+        //console.log(sunQuery);
         sunburstUpdate(sunQuery);
     }
     function transitionSun(d){
@@ -297,4 +280,87 @@ function changeSunQueryLabel(){
     var text2 = document.createTextNode(string);
     text.appendChild(text2);
     p.appendChild(text);
+    changeNation(sunQuery);
+}
+
+var arr = [];
+var countries;
+function drawSunMap(){
+    var width = 560,
+        height = 400;
+
+    var projection = d3.geoKavrayskiy7()
+        .scale(100)
+        .translate([width / 2, height / 2])
+        .precision(.1);
+
+    var path = d3.geoPath().projection(projection);
+
+    var svg = d3.select("#sun").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    queue()
+        .defer(d3.json, "./world-110m.json")
+        .defer(d3.tsv, "./world-country-names.tsv")
+        .await(ready);
+
+    function ready(error, world, names) {
+        if (error) throw error;
+
+        countries = topojson.feature(world, world.objects.countries).features;
+
+        //map country names to IDs used on map
+        arr=[];
+        names.forEach(function(i){
+            //console.log(i.name);
+            arr[i.id]=i.name;
+        });
+
+        svg.selectAll(".country")
+            .data(countries)
+            .enter().insert("path", ".graticule")
+            .attr("class", "suncountry")
+            .attr("d", path)
+            .style("fill", function(d) {
+                var n = arr[d.id];
+                var sq = keys[skeys.indexOf(sunQuery)];
+                if (keys.indexOf(n) >= 0){
+                    if (sq == n){
+                        return "#1e3699";
+                    }
+                    return "#86BBD8";
+                } else {
+                    return "#CCCCCC";
+                }
+            });
+
+        svg.insert("path", ".graticule")
+            .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+            .attr("class", "boundary")
+            .attr("d", path);
+    }
+
+    d3.select(self.frameElement).style("height", height + "px");
+}
+
+function changeNation(nat){
+
+    d3.select("#sun").selectAll(".suncountry")
+        .style("fill", function(d, i){
+            if (nat == "global"){
+                return "#1e3699";
+            }
+
+            var n = arr[d.id];
+            var sq = keys[skeys.indexOf(nat)];
+            if (keys.indexOf(n) >= 0){
+                if (sq == n){
+                    return "#1e3699";
+                }
+                return "#86BBD8";
+            } else {
+                return "#CCCCCC";
+            }
+        })
 }

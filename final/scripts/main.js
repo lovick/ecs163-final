@@ -78,3 +78,5 @@ function timeUpdate(start, end) {
 function streamgraphUpdate(value) {
     // wait fuck this there's nothing to do with this
 }
+
+drawSunMap();   //map should not be changed and is only affected by sunburst but must be declared globally bc this method is a bitch to work with
