@@ -161,13 +161,20 @@ function Treemap(container, data, updateFunc) {
         .attr('height', 20)
         .style('fill', function (d) {
             return color(d)
+        })
+        .on("click", function(d) {
+            updateFunc(d);
         });
 
     // legend text
     legendItem.append('text')
         .attr('x', 25)
         .attr('y', 15).text(function (d) {
-        return d;
-    });
+            return d;
+        })
+        .on("click", function(d) {
+            updateFunc(d);
+        })
+        ;
 
 }

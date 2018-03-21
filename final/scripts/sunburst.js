@@ -245,6 +245,7 @@ function updateSunburstChart(table){
             } else {
             }
         }
+
         changeSunQueryLabel();
         transitionSun(d);
         //TODO: signal change to other viz here
@@ -301,7 +302,7 @@ function changeSunQueryLabel(){
     var text2 = document.createTextNode(string);
     text.appendChild(text2);
     p.appendChild(text);
-    changeNation(sunQuery);
+    //changeNation(sunQuery);  
 }
 
 
@@ -355,7 +356,19 @@ function drawSunMap(){
                 } else {
                     return "#CCCCCC";
                 }
-            });
+            })
+            /*.on("click", function(d, i) {
+                var n = arr[d.id];
+                var sq = keys[skeys.indexOf(d.id)];
+                if (keys.indexOf(n) != -1) {
+                    sunQuery = skeys[keys.indexOf(n)];
+                } else {
+                    sunQuery = "global";
+                }
+                artistQuery = "";
+                sunburstUpdate(sunQuery);
+            })*/
+            ;
 
         svg.insert("path", ".graticule")
             .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
