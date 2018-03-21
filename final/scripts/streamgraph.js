@@ -107,7 +107,7 @@ function Streamgraph(container, data) {
         result2.push(obj);
     });
 
-    // console.log(result2);
+    // reference: https://bl.ocks.org/codementum/ae610a1e44e562afcaa327982629a37c
 
     var stack = d3.stack()
     .keys(top50)
